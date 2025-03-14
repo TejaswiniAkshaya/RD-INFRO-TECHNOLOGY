@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>To-Do List</title>
+    <style>
+        /* General page styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        /* To-Do Container */
+        .todo-container {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            text-align: center;
+        }
+
+        /* Header */
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        /* Input and Button Styles */
+        input[type="text"] {
+            width: 75%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px 2px;
+        }
+
+        .add-btn {
+            background: #28a745;
+            color: white;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+        }
+
+        .edit-btn {
+            background: #ffc107;
+            color: black;
+        }
+
+        .save-btn {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.8;
+        }
+
+        /* Task List */
+        ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+
+        li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Error Message */
+        .error {
+            color: red;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        /* Edit Form Styling */
+        .edit-form {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .edit-form input {
+            width: 70%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+
+<div class="todo-container">
+    <h2>To-Do List</h2>
+
+    <div class="error" th:if="${error}" th:text="${error}"></div>
+
+    <!-- Add Task Form -->
+    <form th:action="@{/todo/add}" method="post">
+        <input type="text" name="description" placeholder="Enter new task" required />
+        <button class="btn add-btn" type="submit">Add Task</button>
+    </form>
+
+    <ul>
+        <li th:each="task : ${tasks}">
+            <!-- Editable input field (hidden by default) -->
+            <form th:id="'editForm-' + ${task.id}" th:action="@{/todo/edit/{id}(id=${task.id})}" method="post" class="edit-form" style="display: none;">
+                <input type="text" name="description" th:value="${task.description}" required />
+                <button class="btn save-btn" type="submit">Save</button>
+            </form>
+
+            <!-- Task text and buttons -->
+            <span th:id="'taskText-' + ${task.id}" th:text="${task.description}"></span>
+
+            <div>
+                <button class="btn edit-btn" th:id="'editBtn-' + ${task.id}" th:onclick="'editTask(' + ${task.id} + ')'">Edit</button>
+
+                <form th:action="@{/todo/delete/{id}(id=${task.id})}" method="post" style="display: inline;">
+                    <button class="btn delete-btn" type="submit">Delete</button>
+                </form>
+            </div>
+        </li>
+    </ul>
+</div>
+
+<script>
+    function editTask(taskId) {
+        // Hide task text
+        document.getElementById("taskText-" + taskId).style.display = "none";
+
+        // Show edit form
+        document.getElementById("editForm-" + taskId).style.display = "flex";
+
+        // Hide edit button
+        document.getElementById("editBtn-" + taskId).style.display = "none";
+    }
+</script>
+
+</body>
+</html>
